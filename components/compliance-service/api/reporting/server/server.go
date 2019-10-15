@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	sorter "sort"
@@ -257,6 +258,8 @@ func getExportHandler(format string, stream reporting.ReportingService_ExportSer
 		return jsonExport(stream), nil
 	case "csv":
 		return csvExport(stream), nil
+	case "xml":
+		return xmlExport(stream), nil
 	default:
 		return nil, status.Error(codes.Unauthenticated, fmt.Sprintf(format+" export is not supported"))
 	}
@@ -284,6 +287,28 @@ func jsonExport(stream reporting.ReportingService_ExportServer) exportHandler {
 		_, err = io.CopyBuffer(writer, reader, buf)
 		if err != nil {
 			return fmt.Errorf("Failed to export JSON: %+v", err)
+		}
+
+		return nil
+	}
+}
+
+func xmlExport(stream reporting.ReportingService_ExportServer) exportHandler {
+	return func(data *reporting.Report) error {
+		raw, err := xml.MarshalIndent(data, "test", "")
+		if err != nil {
+			return fmt.Errorf("Failed to marshal XML export data: %+v", err)
+		}
+
+		reader := bytes.NewReader(raw)
+		buf := make([]byte, streamBufferSize)
+
+		writer := chunks.NewWriter(streamBufferSize, func(p []byte) error {
+			return stream.Send(&reporting.ExportData{Content: p})
+		})
+		_, err = io.CopyBuffer(writer, reader, buf)
+		if err != nil {
+			return fmt.Errorf("Failed to export XML: %+v", err)
 		}
 
 		return nil

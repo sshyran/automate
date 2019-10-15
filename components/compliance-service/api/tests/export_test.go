@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -366,4 +367,45 @@ func TestJSONExportWithTwoControlFiltersReturnsError(t *testing.T) {
 
 	grpctest.AssertCode(t, codes.InvalidArgument, err)
 	assert.Equal(t, "rpc error: code = InvalidArgument desc = Invalid: Only one 'control' filter is allowed", err.Error())
+}
+
+func TestXMLExport(t *testing.T) {
+	// get reporting client
+	conn, err := getClientConn()
+	require.NoError(t, err)
+
+	defer conn.Close()
+
+	reporting := rs.NewReportingServiceClient(conn)
+	require.NoError(t, err)
+
+	filterQuery := rs.Query{
+		Type: "xml",
+		Filters: []*rs.ListFilter{
+			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
+			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
+		},
+	}
+
+	stream, err := reporting.Export(context.Background(), &filterQuery)
+	require.NoError(t, err)
+
+	data := make([]byte, 0)
+	for {
+		tdata, err := stream.Recv()
+		if err != nil && err == io.EOF {
+			data = append(data, tdata.GetContent()...)
+			break
+		}
+
+		require.NoError(t, err)
+		data = append(data, tdata.GetContent()...)
+	}
+
+	r := csv.NewReader(strings.NewReader(string(data)))
+
+	records, err := r.ReadAll()
+	require.NoError(t, err)
+	require.Equal(t, 15, len(records))
+	logrus.Infof("records %v", records)
 }
