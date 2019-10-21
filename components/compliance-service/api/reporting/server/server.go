@@ -20,6 +20,7 @@ import (
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/io/chunks"
+	"github.com/sirupsen/logrus"
 )
 
 // Chosen somewhat arbitrarily to be a "good enough" value.
@@ -295,7 +296,8 @@ func jsonExport(stream reporting.ReportingService_ExportServer) exportHandler {
 
 func xmlExport(stream reporting.ReportingService_ExportServer) exportHandler {
 	return func(data *reporting.Report) error {
-		raw, err := xml.MarshalIndent(data, "test", "")
+
+		raw, err := xml.Marshal(data)
 		if err != nil {
 			return fmt.Errorf("Failed to marshal XML export data: %+v", err)
 		}
@@ -313,6 +315,35 @@ func xmlExport(stream reporting.ReportingService_ExportServer) exportHandler {
 
 		return nil
 	}
+}
+
+type Map map[string]interface{}
+
+type xmlMapEntry struct {
+	XMLName xml.Name
+	Value   interface{} `xml:",chardata"`
+}
+
+// MarshalXML marshals the map to XML, with each key in the map being a
+// tag and it's corresponding value being it's contents.
+func (m Map) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(m) == 0 {
+		return nil
+	}
+	logrus.Info("hello?")
+
+	err := e.EncodeToken(start)
+	if err != nil {
+		return err
+	}
+
+	for k, v := range m {
+		for _, val := range v.([]string) {
+			e.Encode(xmlMapEntry{XMLName: xml.Name{Local: k}, Value: val})
+		}
+	}
+
+	return e.EncodeToken(start.End())
 }
 
 func csvExport(stream reporting.ReportingService_ExportServer) exportHandler {
