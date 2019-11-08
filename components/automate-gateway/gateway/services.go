@@ -40,6 +40,7 @@ import (
 	pb_eventfeed "github.com/chef/automate/components/automate-gateway/api/event_feed"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
 	pb_iam_v2beta "github.com/chef/automate/components/automate-gateway/api/iam/v2beta"
+	pb_infra_proxy "github.com/chef/automate/components/automate-gateway/api/infra_proxy"
 	pb_legacy "github.com/chef/automate/components/automate-gateway/api/legacy"
 	pb_license "github.com/chef/automate/components/automate-gateway/api/license"
 	pb_nodes "github.com/chef/automate/components/automate-gateway/api/nodes"
@@ -288,6 +289,12 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_data_feed.RegisterDatafeedServiceServer(grpcServer, handler.NewDatafeedHandler(datafeedClient))
 
+	infraProxyClient, err := clients.InfraProxyClient()
+	if err != nil {
+		return errors.Wrap(err, "create client for secret service")
+	}
+	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler.NewInfraProxyHandler(infraProxyClient))
+
 	return nil
 }
 
@@ -323,6 +330,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"node manager":         pb_nodes_manager.RegisterNodeManagerServiceHandlerFromEndpoint,
 		"telemetry":            pb_telemetry.RegisterTelemetryHandlerFromEndpoint,
 		"data-feed":            pb_data_feed.RegisterDatafeedServiceHandlerFromEndpoint,
+		"infra-proxy":          pb_infra_proxy.RegisterInfraProxyHandlerFromEndpoint,
 	})
 }
 

@@ -17,6 +17,7 @@ import (
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	deployment "github.com/chef/automate/api/interservice/deployment"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
+	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/service"
 	chef_ingest "github.com/chef/automate/api/interservice/ingest"
 	license_control "github.com/chef/automate/api/interservice/license_control"
 	"github.com/chef/automate/api/interservice/local_user"
@@ -52,6 +53,7 @@ var defaultEndpoints = map[string]string{
 	"applications-service":    "0.0.0.0:10133",
 	"nodemanager-service":     "0.0.0.0:10120",
 	"event-feed-service":      "0.0.0.0:10134",
+	"infra-proxy-service":     "0.0.0.0:10153",
 }
 
 // clientMetrics holds the clients (identified by service) for which we'll
@@ -110,6 +112,7 @@ type ClientsFactory interface {
 	LicenseControlClient() (license_control.LicenseControlClient, error)
 	DeploymentServiceClient() (deployment.DeploymentClient, error)
 	DatafeedClient() (data_feed.DatafeedServiceClient, error)
+	InfraProxyClient() (infra_proxy.InfraProxyClient, error)
 }
 
 // clientsFactory caches grpc client connections and returns clients
@@ -458,6 +461,14 @@ func (c *clientsFactory) DatafeedClient() (data_feed.DatafeedServiceClient, erro
 		return nil, err
 	}
 	return data_feed.NewDatafeedServiceClient(conn), nil
+}
+
+func (c *clientsFactory) InfraProxyClient() (infra_proxy.InfraProxyClient, error) {
+	conn, err := c.connectionByName("infra-proxy-service")
+	if err != nil {
+		return nil, err
+	}
+	return infra_proxy.NewInfraProxyClient(conn), nil
 }
 
 func (c *clientsFactory) connectionByName(name string) (*grpc.ClientConn, error) {
