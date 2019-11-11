@@ -333,6 +333,16 @@ func DefaultSpecs(serviceNames []string) []Spec {
 			},
 		},
 		{
+			Name:          "infra-proxy-service",
+			WriteMetadata: true,
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "chef_infra_proxy",
+					User: "infra-proxy",
+				},
+			},
+		},
+		{
 			Name:          "notifications-service",
 			WriteMetadata: true,
 			SyncDbsV2: []DatabaseDumpOperationV2{
