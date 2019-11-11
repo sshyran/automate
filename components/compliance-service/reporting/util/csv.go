@@ -34,6 +34,15 @@ type csvFields struct {
 	ResultSkipMessage     string    `csv:"Result Skip Message"`
 }
 
+func filterFields(dataToExport *reportingapi.DataToExport) {
+	csvFields := make(map[string]bool)
+	csvFields["node_name"] = true
+	if len(dataToExport.BlacklistFields) > 0 {
+
+	}
+
+}
+
 // ReportToCSV converts a report to its CSV representation as a string
 // which includes a header line.
 func ReportToCSV(report *reportingapi.Report, dataToExport *reportingapi.DataToExport) (string, error) {
