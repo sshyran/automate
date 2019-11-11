@@ -321,6 +321,17 @@ message Query {
 	int32 page = 23;
 	// The number of results on each paginated request page.
 	int32 per_page = 24;
+	// Intentionally blank.
+	DataToExport data_to_export = 25;
+}
+
+// Used to specify which fields should be included in the report. Only `blacklist_fields` OR `whitelist_fields` is allowed. 
+// Combining the two will result in an error.
+message DataToExport {
+	// Fields to skip (NOT include) in the exported results. Not allowed to combine with `whitelist fields`.
+	repeated string blacklist_fields = 1;
+	// Fields to include in the exported results.
+	repeated string whitelist_fields = 2;
 }
 
 message ListFilter {

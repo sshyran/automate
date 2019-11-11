@@ -427,6 +427,26 @@
       },
       "description": "A minimal represenation of the statuses of the controls in the report."
     },
+    "chef.automate.api.compliance.reporting.v1.DataToExport": {
+      "type": "object",
+      "properties": {
+        "blacklist_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Fields to skip (NOT include) in the exported results. Not allowed to combine with `whitelist fields`."
+        },
+        "whitelist_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Fields to include in the exported results."
+        }
+      },
+      "description": "Used to specify which fields should be included in the report. Only `blacklist_fields` OR `whitelist_fields` is allowed. \nCombining the two will result in an error."
+    },
     "chef.automate.api.compliance.reporting.v1.Dependency": {
       "type": "object",
       "properties": {
@@ -917,6 +937,10 @@
           "type": "integer",
           "format": "int32",
           "description": "The number of results on each paginated request page."
+        },
+        "data_to_export": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.DataToExport",
+          "description": "Intentionally blank."
         }
       }
     },

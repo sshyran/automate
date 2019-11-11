@@ -35,6 +35,11 @@ message Query {
 	string sort = 22;
 	int32 page = 23;
 	int32 per_page = 24;
+	DataToExport data_to_export = 25;
+}
+message DataToExport {
+	repeated string blacklist_fields = 1;
+	repeated string whitelist_fields = 2;
 }
 message ListFilter {
 	repeated string values = 20;

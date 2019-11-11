@@ -203,6 +203,10 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 		return err
 	}
 
+	if len(in.GetDataToExport().GetBlacklistFields()) > 0 && len(in.GetDataToExport().GetWhitelistFields()) > 0 {
+		return status.Error(codes.InvalidArgument, "Invalid: Cannot specify both 'blacklist_fields' and 'whitelist_fields'")
+	}
+
 	if len(formattedFilters["profile_name"]) > 0 && len(formattedFilters["profile_id"]) > 0 {
 		return status.Error(codes.InvalidArgument, "Invalid: Cannot specify both 'profile_name' and 'profile_id' filters")
 	}
