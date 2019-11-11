@@ -223,7 +223,7 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 		return status.Error(codes.InvalidArgument, "Invalid: Only one 'control' filter is allowed")
 	}
 
-	exporter, err := getExportHandler(in.Type, stream)
+	exporter, err := getExportHandler(in.Type, stream, in.GetDataToExport())
 	if err != nil {
 		return err
 	}
@@ -255,12 +255,12 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 	return nil
 }
 
-func getExportHandler(format string, stream reporting.ReportingService_ExportServer) (exportHandler, error) {
+func getExportHandler(format string, stream reporting.ReportingService_ExportServer, dataToExport *reporting.DataToExport) (exportHandler, error) {
 	switch format {
 	case "", "json":
 		return jsonExport(stream), nil
 	case "csv":
-		return csvExport(stream), nil
+		return csvExport(stream, dataToExport), nil
 	default:
 		return nil, status.Error(codes.Unauthenticated, fmt.Sprintf(format+" export is not supported"))
 	}
@@ -294,10 +294,10 @@ func jsonExport(stream reporting.ReportingService_ExportServer) exportHandler {
 	}
 }
 
-func csvExport(stream reporting.ReportingService_ExportServer) exportHandler {
+func csvExport(stream reporting.ReportingService_ExportServer, dataToExport *reporting.DataToExport) exportHandler {
 	initialRun := true
 	return func(data *reporting.Report) error {
-		res, err := util.ReportToCSV(data)
+		res, err := util.ReportToCSV(data, dataToExport)
 		if err != nil {
 			return err
 		}

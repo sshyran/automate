@@ -36,12 +36,15 @@ type csvFields struct {
 
 // ReportToCSV converts a report to its CSV representation as a string
 // which includes a header line.
-func ReportToCSV(report *reportingapi.Report) (string, error) {
+func ReportToCSV(report *reportingapi.Report, dataToExport *reportingapi.DataToExport) (string, error) {
 	var cache = []csvFields{}
 
 	if report == nil {
 		return "", fmt.Errorf("Received an empty report to be converted to CSV.")
 	}
+
+	// get blacklisted/whitelisted fields and only include desired data
+
 	for _, profile := range report.Profiles {
 		for _, control := range profile.Controls {
 			for _, result := range control.Results {
