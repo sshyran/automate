@@ -80,11 +80,19 @@ addNoProxy {{datafeed.sys.ip}}
 {{~/if}}
 {{~/eachAlive}}
 {{~#eachAlive bind.nodemanager-service.members as |manager|}}
- {{~#if @last}}
- # Add nodemanager to no_proxy
- addNoProxy {{manager.sys.ip}}
- {{~/if}}
- {{~/eachAlive}}
+{{~#if @last}}
+# Add nodemanager to no_proxy
+addNoProxy {{manager.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.infra-proxy-service.members as |infra|}}
+{{~#if @last}}
+# Add infra-proxy-service to no_proxy
+addNoProxy {{infra.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+
+
 
 # Start our service
 exec automate-gateway serve --config {{pkg.svc_config_path}}/config.toml
