@@ -124,7 +124,7 @@ message Run {
   // Chef Error information, available on failed runs.
   ChefError                 error                  = 20;
   // Unused field.
-  repeated string           tags                   = 21;
+  repeated string           tags                   = 21  [deprecated=true];
   // List of resource names for the node.
   repeated string           resource_names         = 22;
   // List of recipes the node calls.
