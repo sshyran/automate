@@ -2,7 +2,7 @@
   "x-tagGroups": [
     {
       "name": "Compliance",
-      "tags": ["ReportingService", "StatsService"]
+      "tags": ["ReportingService", "StatsService", "JobsService"]
     },
     {
       "name": "Infra",
@@ -23,6 +23,7 @@
     { "name": "ConfigMgmt", "x-displayName": "Nodes" },
     { "name": "NodesService", "x-displayName": "Nodes" },
     { "name": "service_groups", "x-displayName": "Service Groups and Services" },
-    { "name": "retention", "x-displayName": "Service Management" }
+    { "name": "retention", "x-displayName": "Service Management" },
+    { "name": "JobsService", "x-displayName": "Scan Jobs" }
   ]
 }
