@@ -20,11 +20,12 @@ import (
 )
 
 // MarkNodesMissing marks all nodes that have passed the specified threshold as 'missing'
-func (es *Backend) MarkNodesMissing(ctx context.Context, threshold string) (int, error) {
+func (es *Backend) MarkNodesMissing(ctx context.Context, threshold string) ([]string, int, error) {
 	// TODO: (afiune) Update me when we get rid of the AllMappings array
 	var (
-		updateCount int
-		nodesIndex  = mappings.NodeState.Alias
+		updateCount   int
+		markedNodeIds []string
+		nodesIndex    = mappings.NodeState.Alias
 	)
 
 	// The range query that will gather the nodes that have
@@ -81,19 +82,25 @@ func (es *Backend) MarkNodesMissing(ctx context.Context, threshold string) (int,
 		// Keep a count of how many nodes we updated
 		updateCount = updateCount + len(bulkResponse.Updated())
 
+		for _, vals := range bulkResponse.Items {
+			for _, v := range vals {
+				markedNodeIds = append(markedNodeIds, v.Id)
+			}
+		}
+
 		// If one Bulk failed, lets exit
 		if err != nil {
-			return updateCount, err
+			return markedNodeIds, updateCount, err
 		}
 	}
 
-	return updateCount, nil
+	return markedNodeIds, updateCount, nil
 }
 
 // DeleteMarkedNodes will delete all the nodes from elasticsearch that no longer
 // exists for the eyes of the config-mgmt-service. (that is, the nodes that has exists=false)
 // The time constraint is the provided threshold
-func (es *Backend) DeleteMarkedNodes(ctx context.Context, threshold string) (updateCount int, err error) {
+func (es *Backend) DeleteMarkedNodes(ctx context.Context, threshold string) (markedNodeIds []string, updateCount int, err error) {
 	nodesIndex := mappings.NodeState.Alias
 	allConvergeHistoryIndex := mappings.ConvergeHistory.Index + "-*"
 
@@ -169,6 +176,11 @@ func (es *Backend) DeleteMarkedNodes(ctx context.Context, threshold string) (upd
 		// Keep a count of how many nodes we deleted
 		updateCount = updateCount + len(bulkResponse.Deleted())
 
+		for _, vals := range bulkResponse.Items {
+			for _, v := range vals {
+				markedNodeIds = append(markedNodeIds, v.Id)
+			}
+		}
 		// If one Bulk failed, lets exit
 		if err != nil {
 			break
