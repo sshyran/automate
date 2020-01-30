@@ -1559,7 +1559,10 @@ func init() {
           "description": "The list of projects this policy belongs to."
         }
       },
-      "description": "Does not contain type as the enduser can only create 'custom' policies."
+      "description": "Does not contain type as the enduser can only create 'custom' policies.",
+      "required": [
+        "id"
+      ]
     },
     "chef.automate.api.iam.v2.UpdatePolicyResp": {
       "type": "object",
