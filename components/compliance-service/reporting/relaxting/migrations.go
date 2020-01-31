@@ -414,24 +414,36 @@ func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (
 		reindexCall = reindexCall.Script(script)
 	}
 
-	startTaskResult, err := reindexCall.DoAsync(context.Background())
+	ctx := context.Background()
+	startTaskResult, err := reindexCall.DoAsync(ctx)
 	if err != nil {
 		return indexToMigrateExists, errors.Wrap(err, fmt.Sprintf("%s call to reindex failed", myName))
 	}
 
 	for {
 		time.Sleep(time.Second * 1)
-		completed, err := backend.ReindexStatus(context.Background(), startTaskResult.TaskId)
+		tasksGetTaskResponse, err := elastic.NewTasksGetTaskService(esClient).
+			TaskId(startTaskResult.TaskId).
+			WaitForCompletion(false).
+			Do(ctx)
 		if err != nil {
 			return indexToMigrateExists, err
 		}
-		if completed {
-			break
+		// We cannot rely only on 'tasksGetTaskResponse.Completed' and 'err' to tell us if we successfully reindex
+		// This is where 'tasksGetTaskResponse.Task.Status.created' is needed. A successful reindex will result
+		// in 'created' becoming 1 after 'Completed' is 'true'
+		if tasksGetTaskResponse.Completed {
+			switch v := tasksGetTaskResponse.Task.Status.(type) {
+			case map[string]interface{}:
+				created := v["created"].(float64)
+				if created == 1.0 {
+					return indexToMigrateExists, nil
+				}
+			}
+			return indexToMigrateExists, fmt.Errorf("Reindex task %s completed but failed to create %s", startTaskResult.TaskId, dest)
 		}
 		logrus.Debugf(" * migrating: waiting for reindex task %s to complete", startTaskResult.TaskId)
 	}
-
-	return indexToMigrateExists, nil
 }
 
 func (backend ES2Backend) getLatestReportIds(sumDailyToday string) ([]string, error) {
