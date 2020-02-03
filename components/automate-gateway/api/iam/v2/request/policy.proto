@@ -8,10 +8,15 @@ import "components/automate-gateway/api/iam/v2/common/policy.proto";
 
 // Does not contain type as the enduser can only create 'custom' policies.
 message CreatePolicyReq {
+    // Unique, user-specified ID. Cannot be changed.
     string id = 1;
+    // Name for the new policy.
     string name = 2;
+    // Members affected by this policy.
     repeated string members = 3;
+    // Statements for the new policy. Must contain one or more.
     repeated Statement statements = 4;
+    // The list of projects this policy belongs to.
     repeated string projects = 5;
 }
 
@@ -23,6 +28,7 @@ message ListPoliciesReq {}
 
 message AddPolicyMembersReq {
     string id = 1;
+    // List of members to add to the policy.
     repeated string members = 2;
 }
 
@@ -32,10 +38,15 @@ message GetPolicyReq {
 
 // Does not contain type as the enduser can only create 'custom' policies.
 message UpdatePolicyReq {
+    // Unique, user-specified ID. Cannot be changed.
     string id = 1;
+    // Members affected by this policy.
     repeated string members = 2;
+    // Statements for the policy. Must contain one or more.
     repeated Statement statements = 3;
+    // Name for this policy.
     string name = 8;
+    // The list of projects this policy belongs to.
     repeated string projects = 9;
 }
 
@@ -54,19 +65,25 @@ message ListPolicyMembersReq {
 
 message ReplacePolicyMembersReq {
     string id = 1;
+    // List of members that replaces previous policy member list.
     repeated string members = 2;
 }
 
 message RemovePolicyMembersReq {
     string id = 1;
+    // List of members to remove from the policy.
     repeated string members = 2;
 }
 
 // Does not contain type as the enduser can only create 'custom' roles.
 message CreateRoleReq {
+    // Unique, user-specified ID. Cannot be changed.
     string id = 1;
+    // Name for the new role.
     string name = 2;
+    // List of actions that this role scopes to.
     repeated string actions = 3;
+    // The list of projects this role belongs to.
     repeated string projects = 4;
 }
 
@@ -79,9 +96,13 @@ message DeleteRoleReq {
 }
 
 message UpdateRoleReq {
+    // Unique, user-specified ID. Cannot be changed.
     string id = 1;
+    // Name for the role.
     string name = 2;
+    // List of actions that this role scopes to.
     repeated string actions = 3;
+    // The list of projects this role belongs to.
     repeated string projects = 4;
 }
 
@@ -94,12 +115,16 @@ message GetProjectReq {
 message ListProjectsReq {}
 
 message CreateProjectReq {
+    // Unique, user-specified ID. Cannot be changed.
     string id = 1;
+    // Name for the new project.
     string name = 2;
 }
 
 message UpdateProjectReq {
+    // Unique, user-specified ID. Cannot be changed.
     string id = 1;
+    // Name for the project.
     string name = 2;
 }
 

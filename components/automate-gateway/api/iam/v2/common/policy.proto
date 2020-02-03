@@ -11,11 +11,18 @@ enum Type {
 }
 
 message Policy {
+    // Name for the policy.
     string name = 1;
+    // Unique, user-specified ID. Cannot be changed.
     string id = 2;
+    // Whether this policy is user created or chef managed.
+    // One of `CUSTOM` or `CHEF_MANAGED`, respectively.
     Type type = 3;
+    // Members affected by this policy.
     repeated string members = 4;
+    // Statements for the policy. Must contain one or more.
     repeated Statement statements = 5;
+    // The list of projects this policy belongs to.
     repeated string projects = 6;
 }
 
@@ -24,42 +31,54 @@ message Statement {
         ALLOW = 0;
         DENY = 1;
     }
+    // Whether the statement allows or denies.
+    // One of `ALLOW` or `DENY`, respectively.
     Effect effect = 1;
 
-    // inline definitions
+    // Actions defined inline. Best practices recommend that you use custom roles where practical.
     repeated string actions = 3;
 
-    // references
+    // The role defines a set of actions that the statement is scoped to.
     string role = 4;
 
-    // Note: these are for display only, not to be set in CreatePolicy/UpdatePolicy
+    // DEPRECATED: Resources defined inline. Use projects instead.
     repeated string resources = 5;
 
+    // The project list defines the set of resources that the statement is scoped to.
     repeated string projects = 6;
 }
 
 message Role {
+    // Name for the role.
     string name = 1;
+    // Unique, user-specified ID. Cannot be changed.
     string id = 2;
+    // Whether this policy is user created or chef managed.
+    // One of `CUSTOM` or `CHEF_MANAGED`, respectively.
     Type type = 3;
+    // List of actions that this role scopes to.
     repeated string actions = 4;
+    // The list of projects this role belongs to.
     repeated string projects = 5;
 }
 
 message Project {
+    // Name for the project.
     string name = 1;
+    // Unique, user-specified ID. Cannot be changed.
     string id = 2;
+    // Whether this policy is user created or chef managed.
+    // One of `CUSTOM` or `CHEF_MANAGED`, respectively.
     Type type = 3;
+    // The current status of the rules for this project.
     ProjectRulesStatus status = 4;
 }
 
-// passed to UpgradeToV2 to set version
 enum Flag {
     VERSION_2_0 = 0;
     VERSION_2_1 = 1;
 }
 
-// the only values that may be returned by GetPolicyVersion
 message Version {
     enum VersionNumber {
         V0 = 0;

@@ -23,6 +23,7 @@ message ListPoliciesResp {
 }
 
 message AddPolicyMembersResp {
+  // Resulting list of policy members.
   repeated string members = 1;
 }
 
@@ -39,14 +40,17 @@ message GetPolicyVersionResp {
 message ResetToV1Resp {}
 
 message ListPolicyMembersResp {
+  // List of policy members.
   repeated string members = 1;
 }
 
 message ReplacePolicyMembersResp {
+  // Resulting list of policy members.
   repeated string members = 1;
 }
 
 message RemovePolicyMembersResp {
+  // Resulting list of policy members.
   repeated string members = 1;
 }
 

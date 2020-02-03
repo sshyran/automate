@@ -23,14 +23,19 @@ const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Does not contain type as the enduser can only create 'custom' policies.
 type CreatePolicyReq struct {
-	Id                   string              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string              `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Members              []string            `protobuf:"bytes,3,rep,name=members,proto3" json:"members,omitempty"`
-	Statements           []*common.Statement `protobuf:"bytes,4,rep,name=statements,proto3" json:"statements,omitempty"`
-	Projects             []string            `protobuf:"bytes,5,rep,name=projects,proto3" json:"projects,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
-	XXX_unrecognized     []byte              `json:"-"`
-	XXX_sizecache        int32               `json:"-"`
+	// Unique, user-specified ID. Cannot be changed.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Name for the new policy.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Members affected by this policy.
+	Members []string `protobuf:"bytes,3,rep,name=members,proto3" json:"members,omitempty"`
+	// Statements for the new policy. Must contain one or more.
+	Statements []*common.Statement `protobuf:"bytes,4,rep,name=statements,proto3" json:"statements,omitempty"`
+	// The list of projects this policy belongs to.
+	Projects             []string `protobuf:"bytes,5,rep,name=projects,proto3" json:"projects,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *CreatePolicyReq) Reset()         { *m = CreatePolicyReq{} }
@@ -164,7 +169,8 @@ func (m *ListPoliciesReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_ListPoliciesReq proto.InternalMessageInfo
 
 type AddPolicyMembersReq struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// List of members to add to the policy.
 	Members              []string `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -251,14 +257,19 @@ func (m *GetPolicyReq) GetId() string {
 
 // Does not contain type as the enduser can only create 'custom' policies.
 type UpdatePolicyReq struct {
-	Id                   string              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Members              []string            `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
-	Statements           []*common.Statement `protobuf:"bytes,3,rep,name=statements,proto3" json:"statements,omitempty"`
-	Name                 string              `protobuf:"bytes,8,opt,name=name,proto3" json:"name,omitempty"`
-	Projects             []string            `protobuf:"bytes,9,rep,name=projects,proto3" json:"projects,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
-	XXX_unrecognized     []byte              `json:"-"`
-	XXX_sizecache        int32               `json:"-"`
+	// Unique, user-specified ID. Cannot be changed.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Members affected by this policy.
+	Members []string `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
+	// Statements for the policy. Must contain one or more.
+	Statements []*common.Statement `protobuf:"bytes,3,rep,name=statements,proto3" json:"statements,omitempty"`
+	// Name for this policy.
+	Name string `protobuf:"bytes,8,opt,name=name,proto3" json:"name,omitempty"`
+	// The list of projects this policy belongs to.
+	Projects             []string `protobuf:"bytes,9,rep,name=projects,proto3" json:"projects,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *UpdatePolicyReq) Reset()         { *m = UpdatePolicyReq{} }
@@ -470,7 +481,8 @@ func (m *ListPolicyMembersReq) GetId() string {
 }
 
 type ReplacePolicyMembersReq struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// List of members that replaces previous policy member list.
 	Members              []string `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -517,7 +529,8 @@ func (m *ReplacePolicyMembersReq) GetMembers() []string {
 }
 
 type RemovePolicyMembersReq struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// List of members to remove from the policy.
 	Members              []string `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -565,9 +578,13 @@ func (m *RemovePolicyMembersReq) GetMembers() []string {
 
 // Does not contain type as the enduser can only create 'custom' roles.
 type CreateRoleReq struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Actions              []string `protobuf:"bytes,3,rep,name=actions,proto3" json:"actions,omitempty"`
+	// Unique, user-specified ID. Cannot be changed.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Name for the new role.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// List of actions that this role scopes to.
+	Actions []string `protobuf:"bytes,3,rep,name=actions,proto3" json:"actions,omitempty"`
+	// The list of projects this role belongs to.
 	Projects             []string `protobuf:"bytes,4,rep,name=projects,proto3" json:"projects,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -706,9 +723,13 @@ func (m *DeleteRoleReq) GetId() string {
 }
 
 type UpdateRoleReq struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Actions              []string `protobuf:"bytes,3,rep,name=actions,proto3" json:"actions,omitempty"`
+	// Unique, user-specified ID. Cannot be changed.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Name for the role.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// List of actions that this role scopes to.
+	Actions []string `protobuf:"bytes,3,rep,name=actions,proto3" json:"actions,omitempty"`
+	// The list of projects this role belongs to.
 	Projects             []string `protobuf:"bytes,4,rep,name=projects,proto3" json:"projects,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -870,7 +891,9 @@ func (m *ListProjectsReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_ListProjectsReq proto.InternalMessageInfo
 
 type CreateProjectReq struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Unique, user-specified ID. Cannot be changed.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Name for the new project.
 	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -917,7 +940,9 @@ func (m *CreateProjectReq) GetName() string {
 }
 
 type UpdateProjectReq struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Unique, user-specified ID. Cannot be changed.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Name for the project.
 	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
