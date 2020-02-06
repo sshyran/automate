@@ -1,0 +1,231 @@
+{
+  "platform": {
+    "name": "mac_os_x",
+    "release": "17.7.0"
+  },
+  "profiles": [
+    {
+      "name": "myprofile1",
+      "version": "1.0.1",
+      "sha256": "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+      "title": "My Profile 1 title",
+      "maintainer": "Demo, Inc.",
+      "summary": "My Profile 1 summary",
+      "license": "Apache-2.0",
+      "copyright": "Demo, Inc.",
+      "copyright_email": "support@example.com",
+      "supports": [],
+      "attributes": [],
+      "groups": [
+        {
+          "id": "controls/profile1.rb",
+          "controls": [
+            "pro1-con1",
+            "pro1-con2",
+            "pro1-con3",
+            "pro1-con4",
+            "pro1-con5"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "id": "pro1-con1",
+          "title": "Profile 1 - Control 1",
+          "desc": null,
+          "descriptions": [],
+          "impact": 0.8,
+          "refs": [],
+          "tags": {},
+          "code": "control 'pro1-con1' do\n  impact 0.8\n  title 'Profile 1 - Control 1'\n  describe file('/etc/hosts11111') do\n    its('mode') { should eq 0644 }\n  end\nend\n",
+          "source_location": {
+            "line": 1,
+            "ref": "/Users/apop/git/mycompliance-profile/myprofile1/controls/profile1.rb"
+          },
+          "waiver_data": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "File /etc/hosts11111 mode should eq 420",
+              "run_time": 0.064682,
+              "start_time": "2019-10-18T17:44:39+01:00",
+              "message": "\nexpected: 420\n     got: nil\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "pro1-con2",
+          "title": "Profile 1 - Control 2",
+          "desc": null,
+          "descriptions": [],
+          "impact": 0.9,
+          "refs": [],
+          "tags": {
+            "password": null
+          },
+          "code": "control 'pro1-con2' do\n  impact 0.9\n  title 'Profile 1 - Control 2'\n  tag 'password'\n  describe file('/etc/222222') do\n    it { should exist }\n  end\n  only_if { 1 == 2 }\nend\n",
+          "source_location": {
+            "line": 9,
+            "ref": "/Users/apop/git/mycompliance-profile/myprofile1/controls/profile1.rb"
+          },
+          "waiver_data": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "No-op",
+              "run_time": 8e-06,
+              "start_time": "2019-10-18T17:44:40+01:00",
+              "resource": "No-op",
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "pro1-con3",
+          "title": "Profile 1 - Control 3",
+          "desc": null,
+          "descriptions": [],
+          "impact": 1,
+          "refs": [],
+          "tags": {},
+          "code": "control 'pro1-con3' do\n  impact 1\n  title 'Profile 1 - Control 3'\n  describe file('/tmp/33333') do\n    it { should exist }\n  end\n  describe file('/etc/44444') do\n    it { should exist }\n  end\nend\n",
+          "source_location": {
+            "line": 19,
+            "ref": "/Users/apop/git/mycompliance-profile/myprofile1/controls/profile1.rb"
+          },
+          "waiver_data": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/33333 is expected to exist",
+              "run_time": 9.3e-05,
+              "start_time": "2020-02-06T19:11:49+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/44444 is expected to exist",
+              "run_time": 9.3e-05,
+              "start_time": "2020-02-06T19:11:50+00:00"
+            }
+          ]
+        },
+        {
+          "id": "pro1-con4",
+          "title": "Profile 1 - Control 4",
+          "desc": null,
+          "descriptions": [],
+          "impact": 0.9,
+          "refs": [],
+          "tags": {},
+          "code": "control 'pro1-con4' do\n  impact 0.9\n  title 'Profile 1 - Control 4'\n  describe file('/etc/4-1') do\n    it { should exist }\n  end\n  describe file('/etc/4-2') do\n    it { should exist }\n  end\nend\n",
+          "source_location": {
+            "line": 30,
+            "ref": "/Users/apop/git/mycompliance-profile/myprofile1/controls/profile1.rb"
+          },
+          "waiver_data": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "No-op",
+              "run_time": 9.3e-05,
+              "start_time": "2019-10-18T17:44:40+01:00"
+            }
+          ]
+        },
+        {
+          "id": "pro1-con5",
+          "title": "Profile 1 - Control 5",
+          "desc": null,
+          "descriptions": [],
+          "impact": 0.9,
+          "refs": [],
+          "tags": {},
+          "code": "control 'pro1-con5' do\n  impact 0.9\n  title 'Profile 1 - Control 5'\n  describe file('/etc/55555555') do\n    it { should exist }\n  end\nend\n",
+          "source_location": {
+            "line": 41,
+            "ref": "/Users/apop/git/mycompliance-profile/myprofile1/controls/profile1.rb"
+          },
+          "waiver_data": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/55555555 is expected to exist",
+              "run_time": 9.3e-05,
+              "start_time": "2020-02-06T19:11:51+00:00"
+            }
+          ]
+        }
+      ],
+      "status": "loaded"
+    },
+    {
+      "name": "myprofile2",
+      "version": "1.0.5",
+      "sha256": "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5",
+      "title": "My Profile 2 title",
+      "maintainer": "Demo, Inc.",
+      "summary": "My Profile 2 summary",
+      "license": "Apache-2.0",
+      "copyright": "Demo, Inc.",
+      "copyright_email": "support@example.com",
+      "supports": [],
+      "attributes": [],
+      "groups": [
+        {
+          "id": "controls/profile1.rb",
+          "controls": [
+            "pro2-con1"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "id": "pro2-con1",
+          "title": "Profile 2 - Control 1",
+          "desc": null,
+          "descriptions": [],
+          "impact": 0.8,
+          "refs": [],
+          "tags": {},
+          "code": "control 'pro2-con1' do\n  impact 0.8\n  title 'Profile 2 - Control 1'\n  describe file('/etc/hosts11111') do\n    its('mode') { should eq 0644 }\n  end\nend\n",
+          "source_location": {
+            "line": 1,
+            "ref": "/Users/apop/git/mycompliance-profile/myprofile1/controls/profile1.rb"
+          },
+          "waiver_data": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "File /etc/hosts11111 mode should eq 420",
+              "run_time": 0.064682,
+              "start_time": "2019-10-18T17:44:39+01:00",
+              "message": "\nexpected: 420\n     got: nil\n\n(compared using ==)\n"
+            }
+          ]
+        }
+      ],
+      "status": "loaded"
+    }
+  ],
+  "statistics": {
+    "duration": 0.094509
+  },
+  "version": "4.18.5",
+  "type": "inspec_report",
+  "node_uuid": "34cbbb4c-c502-4971-1111-888888889901",
+  "report_uuid": "44024b50-2e0d-42fa-cccc-yyyyyywwwwza",
+  "job_uuid": "12345678-1234-123e-bbbb-888888888999",
+  "node_name": "osx(2)-zeta-pro1(p)-pro2(w)-passed",
+  "environment": "DevSec Prod Zeta",
+  "roles": [ "base_osx", "apache_osx" ],
+  "recipes": [],
+  "end_time": "2018-04-01T10:18:41Z",
+  "other_checks": [],
+  "policy_name": "",
+  "policy_group": "",
+  "organization_name": "",
+  "source_fqdn": "localhost",
+  "chef_tags": [],
+  "ipaddress": "192.168.56.66",
+  "fqdn": "osx-workstation.example.com"
+}
