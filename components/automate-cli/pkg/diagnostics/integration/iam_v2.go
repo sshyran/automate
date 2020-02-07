@@ -1,6 +1,8 @@
 package integration
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
@@ -12,6 +14,7 @@ import (
 type save struct {
 	PolicyID string `json:"id"`
 	RoleID   string `json:"role_id"`
+	TeamID   string `json:"team_id"`
 }
 
 // This is used to ensure the response body is valid JSON, where we don't
@@ -26,11 +29,19 @@ const roleCreateTemplateStr = `
 }
 `
 
+const v2TeamCreateTemplateStr = `
+{
+  "id": "{{ .ID }}",
+  "name": "{{ .Name }}",
+  "projects": []
+}
+`
+
 const v2PolicyCreateTemplateStr = `
 {
   "id": "{{ .ID }}",
   "name": "{{ .Name }}",
-  "members": ["user:local:testuser", "team:local:testteam"],
+  "members": ["user:local:testuser", "team:local:{{ .TeamID }}"],
   "statements": [
     {
       "effect": "DENY",
@@ -53,6 +64,8 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 	policyType := "CUSTOM"
 	roleID := "test-role-" + uuid.Must(uuid.NewV4()).String()
 	roleName := "This is a test IAM v2 backup and restore role."
+	teamID := "test-team-" + uuid.Must(uuid.NewV4()).String()
+	teamName := "This is a test IAM v2 backup and restore team."
 
 	return diagnostics.Diagnostic{
 		Name: "iam-v2",
@@ -71,7 +84,7 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 			return false, "", nil
 		},
 		Generate: func(tstCtx diagnostics.TestContext) error {
-			tstCtx.SetValue("iam-v2-policy-id", save{PolicyID: policyID, RoleID: roleID})
+			tstCtx.SetValue("iam-v2-policy-id", save{PolicyID: policyID, RoleID: roleID, TeamID: teamID})
 			err := MustJSONDecodeSuccess(
 				tstCtx.DoLBRequest("/apis/iam/v2/roles",
 					lbrequest.WithMethod("POST"),
@@ -84,10 +97,25 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 			}
 
 			err = MustJSONDecodeSuccess(
+				tstCtx.DoLBRequest("/apis/iam/v2/teams",
+					lbrequest.WithMethod("POST"),
+					lbrequest.WithJSONStringTemplateBody(v2TeamCreateTemplateStr,
+						struct{ ID, Name string }{ID: teamID, Name: teamName}),
+				)).WithValue(&empty{})
+
+			if err != nil {
+				return errors.Wrap(err, "Could not create team for use in IAM v2 policy")
+			}
+
+			err = MustJSONDecodeSuccess(
 				tstCtx.DoLBRequest("/apis/iam/v2/policies",
 					lbrequest.WithMethod("POST"),
 					lbrequest.WithJSONStringTemplateBody(v2PolicyCreateTemplateStr,
-						struct{ ID, Name, RoleID string }{ID: policyID, Name: policyName, RoleID: roleID}),
+						struct{ ID, Name, RoleID, TeamID string }{
+							ID:     policyID,
+							Name:   policyName,
+							RoleID: roleID,
+							TeamID: teamID}),
 				)).WithValue(&empty{})
 			return errors.Wrap(err, "Could not create IAM v2 policy")
 		},
@@ -104,10 +132,12 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 			}
 			resp := struct {
 				Policy struct {
-					Id, Name, Type string
+					ID, Name, Type string
+					Members        []string
 					Statements     []Statement
 				}
 			}{}
+			expectedMembers := []string{"user:local:testuser", fmt.Sprintf("team:local:%s", loaded.TeamID)}
 			expectedStmts := []Statement{
 				{
 					Actions:   []string{"test:svc:someaction", "test:svc:otheraction"},
@@ -125,8 +155,9 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 				WithValue(&resp)
 			require.NoError(tstCtx, err, "Expected to be able to retrieve stored IAM v2 policy")
 			require.Equal(tstCtx, policyName, resp.Policy.Name)
-			require.Equal(tstCtx, loaded.PolicyID, resp.Policy.Id)
+			require.Equal(tstCtx, loaded.PolicyID, resp.Policy.ID)
 			require.Equal(tstCtx, policyType, resp.Policy.Type)
+			require.ElementsMatch(tstCtx, expectedMembers, resp.Policy.Members)
 			require.ElementsMatch(tstCtx, expectedStmts, resp.Policy.Statements)
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
@@ -142,6 +173,15 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 
 			if err != nil {
 				return errors.Wrap(err, "Could not delete role used in IAM v2 policy")
+			}
+
+			err = MustJSONDecodeSuccess(
+				tstCtx.DoLBRequest("/apis/iam/v2/teams/"+loaded.TeamID,
+					lbrequest.WithMethod("DELETE")),
+			).WithValue(&empty{})
+
+			if err != nil {
+				return errors.Wrap(err, "Could not delete team used in IAM v2 policy")
 			}
 
 			err = MustJSONDecodeSuccess(
